@@ -1,0 +1,8 @@
+:host {
+	display: inline-block;
+	
+	min-width: 300px;
+	min-height: 200px;
+
+	border: 10px solid black;
+}
