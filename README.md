@@ -2,9 +2,9 @@
 This is an editor to explore how custom editing experiences can be built using web technologies.  The first iteration of the editor will focus on using low level web primitives like EditContext to capture input, and output will be displayed via a canvas.
 
 ## Setup
-Out intent is to leverage the latest primitives of the web platform.  No frameworks will be used in the construction of this editor.
+Our intent is to leverage the latest primitives of the web platform.  No frameworks will be used in the construction of this editor.
 
-At the time of this writing, you must use a command line flag to enable experimental features in a Chromium-based browser to use the editor: `--enable-blink-features=EditContext,JSONModules,CSSModules`.
+At the time of this writing(January 22, 2020), you must use a command line flag to enable experimental features in a Chromium-based browser to use the editor: `--enable-blink-features=EditContext,JSONModules,CSSModules`.
 
 ## Features (currently just goals for features)
 The Simple Editor is a rich text editor.  It supports changing the font-weight of the text: normal or bold, underlines, different font families, font sizes and text colors.
