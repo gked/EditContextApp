@@ -1,8 +1,13 @@
 :host {
-	display: inline-block;
+	display: inline-flex;
 	
 	min-width: 300px;
 	min-height: 200px;
 
 	border: 10px solid black;
+}
+
+canvas {
+	align-self: stretch;
+	justify-self: stretch;
 }
