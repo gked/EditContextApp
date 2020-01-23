@@ -57,24 +57,35 @@ export default class SimpleEditorView {
 	renderCallback() {
 		this.#invalidated = false
 
+		const topMargin = 10
+		const leftMargin = 10
+
+		let lineTop = topMargin
+		let runOffset = leftMargin
+
+		let ctx = this.#rc.shared2dContext
+
 		for (let block of this.#document) {
 			let lines = this.#blockLineCache.get(block)
 			if (!lines) {
-				lines = BlockLayout.layoutBlock(block)
+				lines = BlockLayout.layoutBlock(block, ctx)
 				this.#blockLineCache.set(block, lines)
 			}
 
 			for (let line of lines) {
-				// render lines here
-				console.log(line)
+				for (let run of line) {
+					ctx.font = run.style.font
+					ctx.fillStyle = run.style.color
+
+					let text = line.text.slice(run.start, run.end)
+					ctx.fillText(text, runOffset, lineTop + line.ascent)
+
+					runOffset += run.measure.width
+				}
+
+				runOffset = leftMargin
+				lineTop += line.ascent + line.descent
 			}
 		}
-
-		let ctx = this.#rc.shared2dContext
-		ctx.fillStyle = Color.random().toString()
-		ctx.fillRect(0, 0, this.#rc.width, this.#rc.height)
-		ctx.fillStyle = Color.random().toString()
-		ctx.font = "bold 48px sans-serif"
-		ctx.fillText("Hello World!!!!!!!!!!!!!!!!!", 0, 100)
 	}
 }

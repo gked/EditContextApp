@@ -12,15 +12,24 @@ export default class SimpleEditorDocument extends EventTarget {
 		super()
 
 		// demo data
-		let style = new Style(
+		let style1 = new Style(
 			/*fontFamily*/"sans-serif", 
 			/*fontSize*/"48px", 
 			/*fontWeight*/"bold", 
 			/*color*/Color.random()
 		)
+		let style2 = new Style(
+			/*fontFamily*/"sans-serif", 
+			/*fontSize*/"64px", 
+			/*fontWeight*/"bold", 
+			/*color*/new Color(255, 0, 0)
+		)
 		this.#blocks = [ 
-			new Block("Hello,", [new Run(0, "Hello,".length, style)]), 
-			new Block("World!", [new Run(0, "World!".length, style)]) 
+			new Block("Hello, BIG", [
+				new Run(0, 7, style1),
+				new Run(7, 10, style2)
+			]), 
+			new Block("World!", [new Run(0, 6, style1)])
 		]
 
 		// Make this document iterable over blocks
