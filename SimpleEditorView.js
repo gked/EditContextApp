@@ -46,6 +46,10 @@ export default class SimpleEditorView {
 
 	// handle change events so layout can be updated then repainted
 	handleDocumentChanged(e) {
+		for (let block of e.changedBlocks) {
+			this.#blockLineCache.delete(block)
+		}
+		
 		this.invalidate()
 	}
 

@@ -1,8 +1,10 @@
-export default class BlockLayout {
-	constructor() {
-	}
+import Line from "./Line.js"
+import Style from "./Style.js"
+import Run from "./Run.js"
 
+export default class BlockLayout {
 	static layoutBlock(block) {
-		return [{height: 13}, {height: 14}, {height: 15}]
+		// TODO: measure and break lines
+		return [new Line(block.text, [...block.runs()])]
 	}
 }
