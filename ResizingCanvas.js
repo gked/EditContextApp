@@ -34,20 +34,26 @@ export default class ResizingCanvas extends EventTarget {
 		return this.#height
 	}
 
-	// handle resize events to reset the dimensions of the canvas 
+	// handle resize events to reset the dimensions of the canvas
+	//
+	// TODO: the canvas internal bitmap is no longer scaled to match device pixels
+	//       as it affects the intrinsic size (for some reason the device pixels values
+	//       are translated to CSS pixels when width and height are unconstrained).
+	//       As a result the canvas can't be used in "shrink-to-fit" scenarios, be
+	//       resized to its container, and simultaneously scaled for high DPI.
 	handleResize(entries) {
 		// only observing one element (our canvas) and assumes its not fragmented
 		console.assert(entries.length === 1)
-		console.assert(entries[0].target === this.canvas)
+		console.assert(entries[0].target === this.#canvas)
 
-		this.#width = entries[0].contentRect.width * devicePixelRatio
-		this.#height = entries[0].contentRect.height * devicePixelRatio
+		this.#width = entries[0].contentRect.width // * devicePixelRatio
+		this.#height = entries[0].contentRect.height // * devicePixelRatio
 
-		this.canvas.width = this.#width
-		this.canvas.height = this.#height
+		this.#canvas.width = this.#width
+		this.#canvas.height = this.#height
 
 		this.#ctx.resetTransform()
-		this.#ctx.scale(devicePixelRatio, devicePixelRatio)
+		//this.#ctx.scale(devicePixelRatio, devicePixelRatio)
 
 		this.dispatchEvent(new CustomEvent("resize"))		
 	}
