@@ -13,6 +13,8 @@ export default class Block extends EventTarget {
 		this.#runs = [...runs]
 
 		this[Symbol.iterator] = this.runs.bind(this)
+
+		this.validateRuns()
 	}
 
 	get text() {
@@ -30,8 +32,11 @@ export default class Block extends EventTarget {
 		}
 		console.assert(offset <= this.#text.length)
 
+		// Normalize insertText
+		insertText = insertText ?? ""
+
 		let chars = [...this.#text]
-		chars.splice(offset, removeCount, insertText)
+		chars.splice(offset, removeCount, ...insertText)
 		this.#text = chars.join("")
 
 		// Update all the Runs in this Block to account for the new text.
@@ -52,18 +57,18 @@ export default class Block extends EventTarget {
 			if (run.start <= offset) {
 				// First run to intersect will cover all the insertedText,
 				// but it may not cover all the characters to be removed
-				let runEnd = Math.min(offset, run.end - removeCount) + insertText.length
+				let runEnd = Math.max(offset, run.end - removeCount) + insertText.length
 				runs.push(new Run(run.start, runEnd, run.style))
 
 				// removeCount is now remaining to be removed in subsequent Runs
-				removeCount = Math.min(0, removeCount - (run.end - offset))
+				removeCount = Math.max(0, removeCount - (run.end - offset))
 				continue
 			}
 
 			console.assert(run.start > offset)
 			if (run.length <= removeCount) {
 				// We don't need this Run, it's completely removed
-				removeCount = Math.min(0, removeCount - (run.length))
+				removeCount = Math.max(0, removeCount - (run.length))
 				continue
 			}
 
@@ -76,6 +81,8 @@ export default class Block extends EventTarget {
 		}
 
 		this.#runs = runs
+
+		this.validateRuns()
 
 		this.dispatchEvent(new CustomEvent("changed"))
 	}
@@ -90,12 +97,31 @@ export default class Block extends EventTarget {
 	}
 
 	*runs() {
-		for(let i = 0; i < this.#runs.length; i++) {
-			yield this.#runs[i]
+		let runs = [...this.#runs]
+		for(let run of runs) {
+			yield run
 		}
 	}
 
 	toString() {
 		return this.text
+	}
+
+	validateRuns() {
+		let charCount = this.text.length
+		let previousRunEnd = 0
+
+		for (let run of this.runs()) {
+			if (run.start != previousRunEnd)
+				throw new Error("run start not equal to previous run end")
+
+			if (run.end < run.start)
+				throw new Error("run end less than run start")
+
+			previousRunEnd = run.end	
+		}
+
+		if(previousRunEnd != charCount)
+			throw new Error("runs did not cover a range equal to the text length")
 	}
 }
