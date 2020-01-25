@@ -74,7 +74,7 @@ export default class Block extends EventTarget {
 				continue
 			}
 
-			console.assert(run.start > offset)
+			console.assert(run.start >= offset)
 			if (run.length <= removeCount) {
 				// We don't need this Run, it's completely removed
 				removeCount = Math.max(0, removeCount - (run.length))

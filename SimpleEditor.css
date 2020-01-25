@@ -7,7 +7,9 @@
 	border: 10px solid black;
 }
 
-canvas {
+div {
+	display: flex;
+	
 	align-self: stretch;
 	justify-self: stretch;
 }

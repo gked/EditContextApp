@@ -34,8 +34,6 @@ export default class SimpleEditorDocument extends EventTarget {
 			new Block("World!", [new Run(0, 6, style1)])
 		]
 
-		this.#selection = new Selection(this, /*intialBlock*/this.#blocks[0])
-
 		// Make this document iterable over blocks
 		this[Symbol.iterator] = this.blocks.bind(this)
 	}

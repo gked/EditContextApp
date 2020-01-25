@@ -17,6 +17,6 @@ export class SimpleEditor extends HTMLElement {
 		this.#document = new SimpleEditorDocument()
 		this.#view = new SimpleEditorView(this.#document)
 
-		this.#shadowRoot.append(this.#view.canvas)
+		this.#shadowRoot.append(this.#view.container)
 	}
 }

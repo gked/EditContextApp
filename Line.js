@@ -33,6 +33,10 @@ export default class Line {
 		return descent
 	}
 
+	get height() {
+		return this.ascent + this.descent
+	}
+
 	get text() {
 		return this.#text
 	}
