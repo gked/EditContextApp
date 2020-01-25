@@ -1,4 +1,5 @@
 import Block from "./Block.js"
+import Selection from "./Selection.js"
 
 // Imports for demo data creation
 import Run from "./Run.js"
@@ -7,21 +8,22 @@ import Color from "./Color.js"
 
 export default class SimpleEditorDocument extends EventTarget {
 	#blocks
+	#selection
 
 	constructor() {
 		super()
 
 		// demo data
 		let style1 = new Style(
-			/*fontFamily*/"sans-serif", 
-			/*fontSize*/"48px", 
 			/*fontWeight*/"bold", 
+			/*fontSize*/"48px", 
+			/*fontFamily*/"sans-serif", 
 			/*color*/Color.random()
 		)
 		let style2 = new Style(
-			/*fontFamily*/"sans-serif", 
-			/*fontSize*/"64px", 
 			/*fontWeight*/"bold", 
+			/*fontSize*/"64px", 
+			/*fontFamily*/"sans-serif", 
 			/*color*/new Color(255, 0, 0)
 		)
 		this.#blocks = [ 
@@ -31,6 +33,8 @@ export default class SimpleEditorDocument extends EventTarget {
 			]), 
 			new Block("World!", [new Run(0, 6, style1)])
 		]
+
+		this.#selection = new Selection(this, /*intialBlock*/this.#blocks[0])
 
 		// Make this document iterable over blocks
 		this[Symbol.iterator] = this.blocks.bind(this)
