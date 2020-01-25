@@ -39,26 +39,35 @@ export default class Block extends EventTarget {
 		chars.splice(offset, removeCount, ...insertText)
 		this.#text = chars.join("")
 
+		this.updateRuns(offset, removeCount, insertText.length)
+
+		this.dispatchEvent(new CustomEvent("changed"))
+	}
+
+	updateRuns(offset, removeCount, insertCount) {
 		// Update all the Runs in this Block to account for the new text.
-		let delta = offset - removeCount + insertText.length
+		let delta = insertCount - removeCount
 		let runs = []
+
+		let firstRun = this.#runs[0]
 
 		for (let run of this.#runs) {
 			if (run.end < offset) {
+				// This run is before the change and is unaffected
 				runs.push(run)
 				continue
 			}
 
-			if (run.start > offset + removeCount) {
-				runs.push(new Run(run.start + delta, run.end + delta, run.style))
-				continue
-			}
+			if (run.start < offset || run.start == offset && offset == 0) {
+				// First run to intersect the changed area.
+				// It will receive all the insertedText,
+				// but it may not cover all the characters to be removed.
+				let runEnd = Math.max(offset, run.end - removeCount) + insertCount
 
-			if (run.start <= offset) {
-				// First run to intersect will cover all the insertedText,
-				// but it may not cover all the characters to be removed
-				let runEnd = Math.max(offset, run.end - removeCount) + insertText.length
-				runs.push(new Run(run.start, runEnd, run.style))
+				// If we removed everything and had nothing to insert we can remove this run
+				if (runEnd - run.start > 0) {
+					runs.push(new Run(run.start, runEnd, run.style))
+				}
 
 				// removeCount is now remaining to be removed in subsequent Runs
 				removeCount = Math.max(0, removeCount - (run.end - offset))
@@ -73,18 +82,30 @@ export default class Block extends EventTarget {
 			}
 
 			console.assert(run.end > run.start + removeCount)
-			// The run length will decrease since we're removing characters from the Run.
-			// The start will not fully increase by delta but every Run after this can just
-			// have the start and end updated by delta.
-			let runStart = run.start - removeCount + insertText.length
-			runs.push(new Run(runStart, run.end + delta, run.style))
+			if (removeCount > 0) {
+				// Last intersected run by the change.  
+				// The start of this run should not decrease fully by delta,
+				// since some of the removeCount hasn't been removed yet - 
+				// it will be taken out of this run.
+				let runStart = run.start + delta + removeCount
+				runs.push(new Run(runStart, run.end + delta, run.style))
+				removeCount = 0
+				continue
+			}
+
+
+			// Everything else just needs the delta added
+			runs.push(new Run(run.start + delta, run.end + delta, run.style))
+		}
+
+		if (runs.length == 0) {
+			// Always have a run to define the style
+			runs.push(new Run(0, 0, firstRun.style))
 		}
 
 		this.#runs = runs
 
 		this.validateRuns()
-
-		this.dispatchEvent(new CustomEvent("changed"))
 	}
 
 	get style() {
