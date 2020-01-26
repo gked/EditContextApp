@@ -12,4 +12,16 @@ export default class LayoutRun extends Run {
 	get measure() {
 		return this.#measure
 	}
+
+	get ascent() {
+		return this.#measure.actualBoundingBoxAscent
+	}
+
+	get descent() {
+		return this.#measure.actualBoundingBoxDescent
+	}
+
+	get height() {
+		return this.ascent + this.descent
+	}
 }

@@ -4,7 +4,7 @@ export default class Style {
 	#fontWeight
 	#color
 
-	constructor(fontFamily, fontSize, fontWeight, color) {
+	constructor(fontWeight, fontSize, fontFamily, color) {
 		this.#fontFamily = fontFamily
 		this.#fontSize = fontSize
 		this.#fontWeight = fontWeight
