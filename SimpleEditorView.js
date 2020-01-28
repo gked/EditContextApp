@@ -18,9 +18,12 @@ export default class SimpleEditorView {
 		this.#document = document
 		this.#document.addEventListener("changed", this.handleDocumentChanged.bind(this))
 
-		let firstBlock = this.#document.blocks().next().value
+		let blockIterator = this.#document.blocks()
+		let firstBlock = blockIterator.next().value
+		let secondBlock = blockIterator.next().value
+
 		this.#selection = new Selection(this.#document, /*intialBlock*/firstBlock)
-		this.#selection.select(firstBlock, 8, firstBlock, 8)
+		this.#selection.select(firstBlock, 3, secondBlock, 4)
 		this.#selection.addEventListener("invalidated", this.invalidate.bind(this))
 
 		this.#renderCallback = this.renderCallback.bind(this)
@@ -73,6 +76,9 @@ export default class SimpleEditorView {
 		if (this.#selection.showCaret) {
 			this.renderCaret()
 		}
+		else if (this.#selection.showSelection) {
+			this.renderSelection()
+		}
 	}
 
 	clear() {
@@ -121,5 +127,69 @@ export default class SimpleEditorView {
 			/*width*/1, 
 			/*height*/caretPoint.run.height
 		)
+	}
+
+	renderSelection() {
+		let linesToPaint = []
+
+		let startPoint = this.#blockLayout.linePointFromBlockOffset(
+			this.#selection.startBlock,
+			this.#selection.startOffset
+		)
+
+		let endPoint = this.#blockLayout.linePointFromBlockOffset(
+			this.#selection.endBlock,
+			this.#selection.endOffset
+		)
+
+		let startFound = false
+		let endFound = false
+
+		let ctx = this.#rc.shared2dContext
+
+		for (let block of this.#document) {
+			// Layout will be up to date so layoutBlock is low cost.
+			let lines = this.#blockLayout.layoutBlock(block, ctx)
+
+			for (let line of lines) {
+				if (!startFound) {
+					if (line == startPoint.line) {
+						linesToPaint.push(line)
+						startFound = true
+					}
+					continue
+				}
+
+				linesToPaint.push(line)
+
+				if (line == endPoint.line) {
+					endFound = true
+					break
+				}
+			}
+
+			if (endFound) {
+				break
+			}
+		}
+
+
+		ctx.fillStyle = "rgba(0, 0, 180, 0.5)"
+
+		let lineTop = startPoint.lineTop + topMargin
+
+		for (let line of linesToPaint) {
+			if (line == startPoint.line) {
+				ctx.fillRect(startPoint.offsetX + leftMargin, lineTop, line.width - startPoint.offsetX, line.height)
+			}
+			else if (line == endPoint.line) {
+				ctx.fillRect(leftMargin, lineTop, endPoint.offsetX, line.height)
+			}
+			else {
+				ctx.fillRect(leftMargin, lineTop, line.width, line.height)
+			}
+
+			lineTop += line.height
+		}
 	}
 }
