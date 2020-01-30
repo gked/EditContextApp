@@ -33,6 +33,15 @@ export default class Line {
 		return descent
 	}
 
+	get width() {
+		let width = 0
+		for(let run of this.#runs) {
+			width += run.measure.width
+		}
+
+		return width
+	}
+
 	get height() {
 		return this.ascent + this.descent
 	}

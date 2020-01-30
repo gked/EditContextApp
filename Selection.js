@@ -51,7 +51,11 @@ export default class Selection extends EventTarget {
 	}
 
 	get showCaret() {
-		return this.#blinkTimer.on
+		return this.isCollapsed && this.#blinkTimer.on
+	}
+
+	get showSelection() {
+		return !this.isCollapsed
 	}
 
 	get anchorBlock() {
