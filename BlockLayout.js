@@ -15,7 +15,7 @@ export default class BlockLayout {
 		this.#canvasContext = canvasContext
 	}
 
-	layoutBlock(block) {
+	layoutBlock (block) {
 			let lines = this.#blockLineCache.get(block)
 			if (lines) {
 				return lines
@@ -54,13 +54,13 @@ export default class BlockLayout {
 				lineTop += line.height
 			}
 		}
-		
+
 		let lines = this.#blockLineCache.get(block)
-		
+
 		let line
 		let run
 		let foundRun = false
-		
+
 		for (line of lines) {
 			for (run of line) {
 				if (run.end >= offset) {
@@ -87,4 +87,37 @@ export default class BlockLayout {
 		return new LinePoint(line, run, lineTop, offsetX)
 	}
 
+	documentPositionFromPoint(x, y, editorOffset) {
+		//const block, offset
+		let ctx = this.#canvasContext
+		const position = {
+			block: null,
+			offset: 0,
+		}
+
+		//console.log(x, y, editorOffset)
+		// make sure click is within bounds of editor
+		if (x > editorOffset.left &&
+			x < editorOffset.left + ctx.canvas.width &&
+			y > editorOffset.top &&
+			y < editorOffset.top + ctx.canvas.height) {
+				const blocks = this.#blockLineCache.getBlocks()
+				let runningBlockHeight = editorOffset.top
+
+				blocks.forEach(function(value, key) {
+					let lines = this.layoutBlock(key)
+					for (let it = 0; it < lines.length; it++) {
+						runningBlockHeight += lines[it].height
+						if (y + editorOffset.top <= runningBlockHeight) {
+							console.log('this is the right block with line height of :', runningBlockHeight, ' pixels')
+							position.block = key
+							position.offset = 0
+							}
+						}
+
+				}, this)
+
+		}
+		return position
+	}
 }
