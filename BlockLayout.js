@@ -95,7 +95,7 @@ export default class BlockLayout {
 			offset: 0,
 		}
 
-		//console.log(x, y, editorOffset)
+		console.log(x, y, editorOffset)
 		// make sure click is within bounds of editor
 		if (x > editorOffset.left &&
 			x < editorOffset.left + ctx.canvas.width &&
@@ -103,19 +103,34 @@ export default class BlockLayout {
 			y < editorOffset.top + ctx.canvas.height) {
 				const blocks = this.#blockLineCache.getBlocks()
 				let runningBlockHeight = editorOffset.top
+				let lastKnownBlock = null
+				let validPositionFound = false
 
 				blocks.forEach(function(value, key) {
+					lastKnownBlock = key
 					let lines = this.layoutBlock(key)
 					for (let it = 0; it < lines.length; it++) {
 						runningBlockHeight += lines[it].height
-						if (y + editorOffset.top <= runningBlockHeight) {
-							console.log('this is the right block with line height of :', runningBlockHeight, ' pixels')
+						if (y <= runningBlockHeight && y >= runningBlockHeight - lines[it].height) {
+							console.log('this is block #: ', it, ' with line height of :', runningBlockHeight, ' pixels')
 							position.block = key
+							// now find position on the line
+							let layoutRuns = [...key.runs()].map(r => {
+								let fSize = r.style.fontSize
+								console.log('font size: ', fSize)
+							})
+							//console.log('Line has: ', lines[it].runs[0])
 							position.offset = 0
-							}
+							validPositionFound = true
 						}
-
+					}
 				}, this)
+				
+				// if user click on a white space within editor, we place the caret in the last known block
+				if (!validPositionFound) {
+					position.block = lastKnownBlock
+					position.offset = 0
+				}
 
 		}
 		return position
