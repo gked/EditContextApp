@@ -2,7 +2,7 @@ import Line from "./Line.js"
 import Style from "./Style.js"
 import LayoutRun from "./LayoutRun.js"
 import BlockLineCache from "./BlockLineCache.js"
-import LinePoint from "./LinePoint.js"
+import LayoutPosition from "./LayoutPosition.js"
 
 export default class BlockLayout {
 	#blockLineCache
@@ -40,9 +40,11 @@ export default class BlockLayout {
 		this.#blockLineCache.delete(block)
 	}
 
-	linePointFromBlockOffset(block, offset) {
+	layoutPositionFromDocumentPosition(documentPosition) {
 		let lineTop = 0
 		let offsetX = 0
+		let block = documentPosition.block
+		let offset = documentPosition.offset
 
 		for (let b of this.#document) {
 			if (b == block) {
@@ -84,7 +86,7 @@ export default class BlockLayout {
 
 		offsetX += measure.width
 
-		return new LinePoint(line, run, lineTop, offsetX)
+		return new LayoutPosition(line, run, lineTop, offsetX)
 	}
 
 }

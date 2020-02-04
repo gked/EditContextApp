@@ -2,6 +2,7 @@ import ResizingCanvas from "./ResizingCanvas.js"
 import BlockLayout from "./BlockLayout.js"
 import Color from "./Color.js"
 import Selection from "./Selection.js"
+import DocumentPosition from "./DocumentPosition.js"
 
 const topMargin = 10
 const leftMargin = 10
@@ -113,33 +114,39 @@ export default class SimpleEditorView {
 	}
 
 	renderCaret() {
-		let caretPoint = this.#blockLayout.linePointFromBlockOffset(
-			this.#selection.startBlock,
-			this.#selection.startOffset
+		let caretPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
+			new DocumentPosition(
+				this.#selection.startBlock,
+				this.#selection.startOffset
+			)
 		)
 
 		let ctx = this.#rc.shared2dContext
 		ctx.fillStyle = "black"
 
 		ctx.fillRect(
-			/*x*/caretPoint.offsetX + leftMargin, 
-			/*y*/caretPoint.lineTop + caretPoint.line.ascent - caretPoint.run.ascent + topMargin,
+			/*x*/caretPosition.runOffset + leftMargin, 
+			/*y*/caretPosition.lineOffset + caretPosition.line.ascent - caretPosition.run.ascent + topMargin,
 			/*width*/1, 
-			/*height*/caretPoint.run.height
+			/*height*/caretPosition.run.height
 		)
 	}
 
 	renderSelection() {
 		let linesToPaint = []
 
-		let startPoint = this.#blockLayout.linePointFromBlockOffset(
-			this.#selection.startBlock,
-			this.#selection.startOffset
+		let startPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
+			new DocumentPosition(
+				this.#selection.startBlock,
+				this.#selection.startOffset
+			)
 		)
 
-		let endPoint = this.#blockLayout.linePointFromBlockOffset(
-			this.#selection.endBlock,
-			this.#selection.endOffset
+		let endPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
+			new DocumentPosition(
+				this.#selection.endBlock,
+				this.#selection.endOffset
+			)
 		)
 
 		let startFound = false
@@ -153,7 +160,7 @@ export default class SimpleEditorView {
 
 			for (let line of lines) {
 				if (!startFound) {
-					if (line == startPoint.line) {
+					if (line == startPosition.line) {
 						linesToPaint.push(line)
 						startFound = true
 					}
@@ -162,7 +169,7 @@ export default class SimpleEditorView {
 
 				linesToPaint.push(line)
 
-				if (line == endPoint.line) {
+				if (line == endPosition.line) {
 					endFound = true
 					break
 				}
@@ -176,20 +183,20 @@ export default class SimpleEditorView {
 
 		ctx.fillStyle = "rgba(0, 0, 180, 0.5)"
 
-		let lineTop = startPoint.lineTop + topMargin
+		let lineOffset = startPosition.lineOffset + topMargin
 
 		for (let line of linesToPaint) {
-			if (line == startPoint.line) {
-				ctx.fillRect(startPoint.offsetX + leftMargin, lineTop, line.width - startPoint.offsetX, line.height)
+			if (line == startPosition.line) {
+				ctx.fillRect(startPosition.runOffset + leftMargin, lineOffset, line.width - startPosition.runOffset, line.height)
 			}
-			else if (line == endPoint.line) {
-				ctx.fillRect(leftMargin, lineTop, endPoint.offsetX, line.height)
+			else if (line == endPosition.line) {
+				ctx.fillRect(leftMargin, lineOffset, endPosition.runOffset, line.height)
 			}
 			else {
-				ctx.fillRect(leftMargin, lineTop, line.width, line.height)
+				ctx.fillRect(leftMargin, lineOffset, line.width, line.height)
 			}
 
-			lineTop += line.height
+			lineOffset += line.height
 		}
 	}
 }
