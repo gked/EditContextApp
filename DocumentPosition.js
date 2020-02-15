@@ -48,6 +48,12 @@ export default class DocumentPosition {
 			return "¶".charCodeAt(0)
 		}
 
+		if (this.offset > this.block.text.length) {
+			// degenerate case representing the position after the last block in the document
+			console.assert(this.blockIndex == this.#blocks.length - 1)
+			return null
+		}
+
 		console.assert(this.offset < this.block.text.length)
 		return this.block.text.charCodeAt(this.offset)
 	}
@@ -59,6 +65,12 @@ export default class DocumentPosition {
 			}
 
 			console.assert(this.blockIndex > 0)
+			return "¶".charCodeAt(0)
+		}
+
+		if (this.offset > this.block.text.length) {
+			// degenerate case representing the position after the last block in the document
+			console.assert(this.blockIndex == this.#blocks.length - 1)
 			return "¶".charCodeAt(0)
 		}
 

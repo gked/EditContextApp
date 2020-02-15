@@ -50,7 +50,8 @@ test(() => {
         {b:"u".charCodeAt(0), a:"i".charCodeAt(0)},
         {b:"i".charCodeAt(0), a:"c".charCodeAt(0)},
         {b:"c".charCodeAt(0), a:"k".charCodeAt(0)},
-        {b:"k".charCodeAt(0), a:"¶".charCodeAt(0)}
+        {b:"k".charCodeAt(0), a:"¶".charCodeAt(0)},
+        {b:"¶".charCodeAt(0), a:null}
     ]
 
     let i = 0
@@ -62,5 +63,10 @@ test(() => {
             i++
         }
     }
+
+    // Validate position after last block in the Document
+    let position = new DocumentPosition(blocks, blocks.length - 1, blocks[blocks.length - 1].text.length + 1)
+    assert_equals(validCodePoints[i].b, position.codePointBefore)
+    assert_equals(validCodePoints[i].a, position.codePointAfter)
 
 }, "DocumentPosition codePoint tests")
