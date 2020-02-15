@@ -33,9 +33,13 @@ The model for the text is held in memory using the following data structures:
 * Selection: two normalized DocumentPositions that represent a range of the Document at which editing operations are targeted.
 
 ### Text Details
-Each block has text member.  Text is represented as a JavaScript String which holds Unicode codepoints encoded in a UTF-16 representation.  Each black has an implicit paragraph separator associated with it. No actual character is stored in the text to represent the break between paragraphs - the Block itself is sufficient.  
+Each block has text member.  Text is represented as a JavaScript String which holds Unicode codepoints encoded in a UTF-16 representation.  Each block has an implicit paragraph separator (U+00B6) associated with it. No actual character is stored in the text to represent the break between paragraphs - the Block itself is sufficient.  
 
-DocumentPositions refer to the space between codepoints and can be used to access the codepoint to either side of it.
+DocumentPositions refer to the space between codepoints and can be used to access the codepoint to either side of it.  The codepoint at the end of a paragraph is reported as U+00B6.  A position after the paragraph separator of a block is represented as being before the first character (at offset 0) of the next block.  A DocumentPosition at an offset equal to the text length of the block is before the paragraph separator.  
+
+Using just these properties it isn't possible to be after the end of the last block.  This is correct.  A document must always have at least one block and all positions are to the "left" of the last block's paragraph separator.
+
+The codePointBefore the first position in a Document is null.
 
 A DocumentPositionIterator can be used to produce DocumentPositions for every gap in the Document so that all codepoints may be accessed.  DocumentPositionIterators are obtained from the Document. 
 
