@@ -42,4 +42,27 @@ export default class DocumentPosition {
 		console.assert(this.blockIndex === position.blockIndex)
 		return 0		
 	}
+
+	get codePointAfter() {
+		if (this.offset === this.block.text.length) {
+			return "¶".charCodeAt(0)
+		}
+
+		console.assert(this.offset < this.block.text.length)
+		return this.block.text.charCodeAt(this.offset)
+	}
+
+	get codePointBefore() {
+		if (this.offset === 0) {
+			if (this.blockIndex == 0) {
+				return null
+			}
+
+			console.assert(this.blockIndex > 0)
+			return "¶".charCodeAt(0)
+		}
+
+		console.assert(this.offset > 0)
+		return this.block.text.charCodeAt(this.offset - 1)
+	}
 }

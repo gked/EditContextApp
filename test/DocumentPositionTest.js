@@ -28,20 +28,39 @@ test(() => {
 test(() => {
     let color = new Color(1, 2, 3)
     let style = new Style("normal", "12px", "serif", color)
-    let run = new Run(0, 7, style)
 
-    let runs = [run]
-    let block = new Block("", runs)
-    let blocks = [block]
+    let block1 = new Block("the cat", [new Run(0, 7, style)])
+    let block2 = new Block("is quick", [new Run(0, 8, style)])
+    let blocks = [block1, block2]
 
-    let position = new DocumentPosition(blocks, 0, 0)
+    let validCodePoints = [
+        {b:null, a:"t".charCodeAt(0)},
+        {b:"t".charCodeAt(0), a:"h".charCodeAt(0)},
+        {b:"h".charCodeAt(0), a:"e".charCodeAt(0)},
+        {b:"e".charCodeAt(0), a:" ".charCodeAt(0)},
+        {b:" ".charCodeAt(0), a:"c".charCodeAt(0)},
+        {b:"c".charCodeAt(0), a:"a".charCodeAt(0)},
+        {b:"a".charCodeAt(0), a:"t".charCodeAt(0)},
+        {b:"t".charCodeAt(0), a:"¶".charCodeAt(0)},
+        {b:"¶".charCodeAt(0), a:"i".charCodeAt(0)},
+        {b:"i".charCodeAt(0), a:"s".charCodeAt(0)},
+        {b:"s".charCodeAt(0), a:" ".charCodeAt(0)},
+        {b:" ".charCodeAt(0), a:"q".charCodeAt(0)},
+        {b:"q".charCodeAt(0), a:"u".charCodeAt(0)},
+        {b:"u".charCodeAt(0), a:"i".charCodeAt(0)},
+        {b:"i".charCodeAt(0), a:"c".charCodeAt(0)},
+        {b:"c".charCodeAt(0), a:"k".charCodeAt(0)},
+        {b:"k".charCodeAt(0), a:"¶".charCodeAt(0)}
+    ]
 
-    assert_readonly(position, "blockIndex")
-    assert_readonly(position, "block")
-    assert_readonly(position, "offset")
+    let i = 0
+    for (let b = 0; b < blocks.length; b++) {
+        for (let o = 0; o <= blocks[b].text.length; o++) {
+            let position = new DocumentPosition(blocks, b, o)
+            assert_equals(validCodePoints[i].b, position.codePointBefore)
+            assert_equals(validCodePoints[i].a, position.codePointAfter)
+            i++
+        }
+    }
 
-    assert_equals(position.blockIndex, 0)
-    assert_equals(position.block, block)
-    assert_equals(position.offset, 0)
-
-}, "DocumentPosition property tests")
+}, "DocumentPosition codePoint tests")
