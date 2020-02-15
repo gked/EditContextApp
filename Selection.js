@@ -2,20 +2,16 @@ import BlinkTimer from "./BlinkTimer.js"
 
 export default class Selection extends EventTarget {
 	#document
-	#anchorBlock
-	#anchorOffset
-	#focusBlock
-	#focusOffset
+	#anchor
+	#focus
 	#blinkTimer
 
-	constructor(document, initialBlock) {
+	constructor(document) {
 		super()
 		
 		this.#document = document
-		this.#anchorBlock = initialBlock
-		this.#anchorOffset = 0
-		this.#focusBlock = initialBlock
-		this.#focusOffset = 0
+		this.#anchor = document.firstPosition
+		this.#focus = this.#anchor
 
 		this.#blinkTimer = new BlinkTimer(/*interval (ms)*/600)
 		this.#blinkTimer.addEventListener("expired", this.invalidate.bind(this))
@@ -23,18 +19,12 @@ export default class Selection extends EventTarget {
 	}
 
 	get isCollapsed() {
-		if (this.#anchorBlock === this.#focusBlock) {
-			return this.#anchorOffset === this.#focusOffset
-		}
-
-		return false
+		return this.#anchor.compare(this.#focus) === 0
 	}
 
-	select(anchorBlock, anchorOffset, focusBlock, focusOffset) {
-		this.#anchorBlock = anchorBlock
-		this.#anchorOffset = anchorOffset
-		this.#focusBlock = focusBlock
-		this.#focusOffset = focusOffset
+	select(anchor, focus) {
+		this.#anchor = anchor
+		this.#focus = focus
 
 		if (this.isCollapsed) {
 			this.#blinkTimer.reset()
@@ -58,93 +48,50 @@ export default class Selection extends EventTarget {
 		return !this.isCollapsed
 	}
 
-	get anchorBlock() {
-		return this.#anchorBlock
+	get anchor() {
+		return this.#anchor
 	}
 
-	get anchorOffset() {
-		return this.#anchorOffset
+	get focus() {
+		return this.#focus
 	}
 
-	get focusBlock() {
-		return this.#focusBlock
+	get start() {
+		if (this.#anchor.compare(this.#focus) <= 0) {
+			return this.#anchor
+		}
+
+		return this.#focus
 	}
 
-	get focusOffset() {
-		return this.#focusOffset
+	get end() {
+		if (this.#anchor.compare(this.#focus) > 0) {
+			return this.#focus
+		}
+
+		return this.#anchor
 	}
 
-	get startBlock() {
-		if (this.#anchorBlock === this.#focusBlock) {
-			return this.#anchorBlock
-		}
+	// get text() {
+	// 	if (this.start.block == this.end.block) {
+	// 		return this.start.block.text.slice(this.start.offset, this.end.offset)
+	// 	}
 
-		for (let block of this.#document) {
-			if (block === this.#anchorBlock || block === this.#focusBlock) {
-				return block
-			}
-		}
-	}
+	// 	let text = ""
+	// 	let afterStart = false
 
-	get startOffset() {
-		if (this.#anchorBlock === this.#focusBlock) {
-			return Math.min(this.#focusOffset, this.#anchorOffset)
-		}
-
-		if (this.startBlock === this.anchorBlock) {
-			return this.#anchorOffset
-		}
-
-		return this.#focusOffset
-	}
-
-	get endBlock() {
-		if (this.#anchorBlock === this.#focusBlock) {
-			return this.#anchorBlock
-		}
-
-		for (let block of this.#document) {
-			if (block === this.#anchorBlock) {
-				return this.#focusBlock
-			}
-			if (block === this.#focusBlock) {
-				return this.#anchorBlock
-			}
-		}
-	}
-
-	get endOffset() {
-		if (this.#anchorBlock === this.#focusBlock) {
-			return Math.max(this.#focusOffset, this.#anchorOffset)
-		}
-		
-		if (this.endBlock === this.anchorBlock) {
-			return this.#anchorOffset
-		}
-
-		return this.#focusOffset
-	}
-
-	get text() {
-		if (this.startBlock == this.endBlock) {
-			return this.startBlock.text.slice(this.startOffset, this.endOffset)
-		}
-
-		let text = ""
-		let afterStart = false
-
-		for (let block of this.#document) {
-			if (this.startBlock == block) {
-				afterStart = true
-				text = this.startBlock.text.slice(this.startOffset)
-			}
-			else if (this.endBlock == block) {
-				text += this.endBlock.text.slice(0, this.endOffset)
-				return text
-			}
-			else if (afterStart) {
-				text += block.text
-			}
-		}
-	}
+	// 	for (let block of this.#document) {
+	// 		if (this.startBlock == block) {
+	// 			afterStart = true
+	// 			text = this.startBlock.text.slice(this.startOffset)
+	// 		}
+	// 		else if (this.endBlock == block) {
+	// 			text += this.endBlock.text.slice(0, this.endOffset)
+	// 			return text
+	// 		}
+	// 		else if (afterStart) {
+	// 			text += block.text
+	// 		}
+	// 	}
+	// }
 }

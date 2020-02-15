@@ -4,7 +4,7 @@ This is an editor to explore how custom editing experiences can be built using w
 ## Setup
 Our intent is to leverage the latest primitives of the web platform.  No frameworks will be used in the construction of this editor.
 
-At the time of this writing(January 22, 2020), you must use a command line flag to enable experimental features in a Chromium-based browser to use the editor: `--enable-blink-features=EditContext,JSONModules,CSSModules`.
+At the time of this writing (January 22, 2020), you must use a command line flag to enable experimental features in a Chromium-based browser to use the editor: `--enable-blink-features=EditContext,JSONModules,CSSModules`.
 
 ## Features (currently just goals for features)
 The Simple Editor is a rich text editor.  It supports changing the font-weight of the text: normal or bold, underlines, different font families, font sizes and text colors.
@@ -26,15 +26,29 @@ Lines wrap automatically when they are too long to fit on a single line.
 The model for the text is held in memory using the following data structures:
 
 * Document: represents the whole body of text in the editor, organized into Blocks.
-* Block: one paragraph of text.
-* Run: a range of text within a Block describing the format to be applied to the text.  Runs are owned by Blocks and are sorted in text order.  Runs do not overlap.  Runs provide complete coverage of the text in a Block.
-* Line: Runs are processed into Lines to facilitate display.  Lines are owned by Blocks and are ordered.  Lines have a height to facilitate drawing and are drawn down the screen one on top of another with some extra space between each Block's lines.
+* Block: one paragraph of text.  Blocks are mutable.
+* Run: a range of text within a Block describing the format to be applied to the text.  Runs are owned by Blocks and are sorted in text order.  Runs do not overlap.  Runs provide complete coverage of the text in a Block.  Runs are immutable.
+* Line: Runs are processed into Lines to facilitate display.  Lines have a height to facilitate drawing and are drawn down the screen one on top of another with some extra space between each Block's lines.  Lines are immutable.
+* DocumentPosition: describes a position in the document using a block and (text) offset.  A DocumentPosition can represent any position in the Document - including positions between any two codepoints that may not be a valid insertion point for new text.
+* Selection: two normalized DocumentPositions that represent a range of the Document at which editing operations are targeted.
+
+### Text Details
+Each block has text member.  Text is represented as a JavaScript String which holds Unicode codepoints encoded in a UTF-16 representation.  Each black has an implicit paragraph separator associated with it. No actual character is stored in the text to represent the break between paragraphs - the Block itself is sufficient.  
+
+DocumentPositions refer to the space between codepoints and can be used to access the codepoint to either side of it.
+
+A DocumentPositionIterator can be used to produce DocumentPositions for every gap in the Document so that all codepoints may be accessed.  DocumentPositionIterators are obtained from the Document. 
 
 ### Input
 Text input is facilitated using EditContext.  Mouse and other pointing input are consumed using PointerEvents.
 
 ### Output
 Text will be measured and rendered to the screen using a canvas element.
+
+### Accessibility
+An HTML view will also be rendered as a child of the canvas for the sake of accessibility.  It has yet to be determined how to properly give the HTML view editing semantics in the accessibility tree.  Perhaps it will be due to the association of the EditContext with the Canvas (requires work in the web platform).
+
+TBD - how much of the accessibility tree needs to be rendered? 
 
 ### Hit Testing
 Pointer input (and vertical movement of the insertion point) will find nearby text using canvas measurement APIs over the applicable line.  The applicable line will be found by iterating the Blocks of the Document and summing their heights for comparison to the y-coordinate of the pointer input.

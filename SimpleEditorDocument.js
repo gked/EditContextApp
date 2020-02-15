@@ -1,5 +1,7 @@
 import Block from "./Block.js"
 import Selection from "./Selection.js"
+import DocumentPosition from "./DocumentPosition.js"
+import DocumentPositionIterator from "./DocumentPositionIterator.js"
 
 // Imports for demo data creation
 import Run from "./Run.js"
@@ -13,6 +15,54 @@ export default class SimpleEditorDocument extends EventTarget {
 	constructor() {
 		super()
 
+		// Make this document iterable over blocks
+		this[Symbol.iterator] = this.blocks.bind(this)
+	}
+
+	// A generator function for access the blocks in this document
+	*blocks() {
+		for (let i = 0; i < this.#blocks.length; i++) {
+			yield this.#blocks[i]
+		}
+	}
+
+	get firstPosition() {
+		return new DocumentPosition(this.#blocks, /*blockIndex*/0, /*offset*/0)
+	}
+
+	get lastPosition() {
+		return new DocumentPosition(
+			this.#blocks, 
+			/*blockIndex*/this.#blocks.length - 1,
+			/*offset*/this.#blocks[this.#blocks.length - 1].text.length
+		)
+	}
+
+	createPosition(blockIndex, offset) {
+		console.assert(blockIndex < this.#blocks.length)
+		console.assert(offset <= this.#blocks[blockIndex].text.length)
+
+		return new DocumentPosition(this.#blocks, blockIndex, offset)
+	}
+
+	createPositionIterator(position) {
+		let blocks = this.#blocks
+
+		if (!position) {
+			position = this.createDocumentPosition()
+		}
+
+		console.assert(position.blockIndex < blocks.length)
+		console.assert(position.offset <= blocks[position.blockIndex].text.length)
+
+		return new DocumentPositionIterator(
+			blocks, 
+			position.blockIndex, 
+			position.offset
+		)
+	}
+
+	generateDemoData() {
 		// demo data
 		let style1 = new Style(
 			/*fontWeight*/"bold", 
@@ -33,15 +83,5 @@ export default class SimpleEditorDocument extends EventTarget {
 			]), 
 			new Block("World!", [new Run(0, 6, style1)])
 		]
-
-		// Make this document iterable over blocks
-		this[Symbol.iterator] = this.blocks.bind(this)
-	}
-
-	// A generator function for the blocks in this document
-	*blocks() {
-		for (let i = 0; i < this.#blocks.length; i++) {
-			yield this.#blocks[i]
-		}
 	}
 }
