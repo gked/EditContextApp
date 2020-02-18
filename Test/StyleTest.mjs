@@ -1,5 +1,5 @@
-import Color from "../Color.js"
-import Style from "../Style.js"
+import Color from "../Color.mjs"
+import Style from "../Style.mjs"
 
 test(() => {
 	let color = new Color(1, 2, 3)

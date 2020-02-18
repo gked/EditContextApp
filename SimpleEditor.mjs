@@ -1,7 +1,7 @@
 import style from "./SimpleEditor.css"
 
-import SimpleEditorView from "./SimpleEditorView.js"
-import SimpleEditorDocument from "./SimpleEditorDocument.js"
+import SimpleEditorView from "./SimpleEditorView.mjs"
+import SimpleEditorDocument from "./SimpleEditorDocument.mjs"
 
 export class SimpleEditor extends HTMLElement {
 	#document

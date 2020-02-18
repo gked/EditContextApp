@@ -1,6 +1,6 @@
-import Color from "../Color.js"
-import Style from "../Style.js"
-import Run from "../Run.js"
+import Color from "../Color.mjs"
+import Style from "../Style.mjs"
+import Run from "../Run.mjs"
 
 test(() => {
 	let color = new Color(1, 2, 3)

@@ -1,4 +1,4 @@
-import DocumentPosition from "./DocumentPosition.js"
+import DocumentPosition from "./DocumentPosition.mjs"
 
 export default class DocumentPositionIterator {
     #blocks

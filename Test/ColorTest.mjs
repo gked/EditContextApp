@@ -1,4 +1,4 @@
-import Color from "../Color.js"
+import Color from "../Color.mjs"
 
 test(() => {
 	let color = new Color(1, 2, 3)

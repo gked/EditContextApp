@@ -1,8 +1,8 @@
-import ResizingCanvas from "./ResizingCanvas.js"
-import BlockLayout from "./BlockLayout.js"
-import Color from "./Color.js"
-import Selection from "./Selection.js"
-import DocumentPosition from "./DocumentPosition.js"
+import ResizingCanvas from "./ResizingCanvas.mjs"
+import BlockLayout from "./BlockLayout.mjs"
+import Color from "./Color.mjs"
+import Selection from "./Selection.mjs"
+import DocumentPosition from "./DocumentPosition.mjs"
 
 const topMargin = 10
 const leftMargin = 10

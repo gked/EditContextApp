@@ -1,8 +1,8 @@
-import Color from "../Color.js"
-import Style from "../Style.js"
-import Run from "../Run.js"
-import Block from "../Block.js"
-import DocumentPositionIterator from "../DocumentPositionIterator.js"
+import Color from "../Color.mjs"
+import Style from "../Style.mjs"
+import Run from "../Run.mjs"
+import Block from "../Block.mjs"
+import DocumentPositionIterator from "../DocumentPositionIterator.mjs"
 
 test(() => {
     let color = new Color(1, 2, 3)

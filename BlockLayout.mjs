@@ -1,8 +1,8 @@
-import Line from "./Line.js"
-import Style from "./Style.js"
-import LayoutRun from "./LayoutRun.js"
-import BlockLineCache from "./BlockLineCache.js"
-import LayoutPosition from "./LayoutPosition.js"
+import Line from "./Line.mjs"
+import Style from "./Style.mjs"
+import LayoutRun from "./LayoutRun.mjs"
+import BlockLineCache from "./BlockLineCache.mjs"
+import LayoutPosition from "./LayoutPosition.mjs"
 
 export default class BlockLayout {
 	#blockLineCache

@@ -1,12 +1,12 @@
-import Block from "./Block.js"
-import Selection from "./Selection.js"
-import DocumentPosition from "./DocumentPosition.js"
-import DocumentPositionIterator from "./DocumentPositionIterator.js"
+import Block from "./Block.mjs"
+import Selection from "./Selection.mjs"
+import DocumentPosition from "./DocumentPosition.mjs"
+import DocumentPositionIterator from "./DocumentPositionIterator.mjs"
 
 // Imports for demo data creation
-import Run from "./Run.js"
-import Style from "./Style.js"
-import Color from "./Color.js"
+import Run from "./Run.mjs"
+import Style from "./Style.mjs"
+import Color from "./Color.mjs"
 
 export default class SimpleEditorDocument extends EventTarget {
 	#blocks

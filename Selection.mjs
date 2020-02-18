@@ -1,4 +1,4 @@
-import BlinkTimer from "./BlinkTimer.js"
+import BlinkTimer from "./BlinkTimer.mjs"
 
 export default class Selection extends EventTarget {
 	#document

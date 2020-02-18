@@ -1,4 +1,4 @@
-import Style from "./Style.js"
+import Style from "./Style.mjs"
 
 export default class Run {
 	#start

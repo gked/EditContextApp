@@ -1,4 +1,4 @@
-import Run from "./Run.js"
+import Run from "./Run.mjs"
 
 export default class LayoutRun extends Run {
 	#measure

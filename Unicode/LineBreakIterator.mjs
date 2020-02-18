@@ -1,5 +1,5 @@
 // See http://www.unicode.org/reports/tr14/
-import DocumentPositionIterator from "../DocumentPositionIterator.js"
+import DocumentPositionIterator from "../DocumentPositionIterator.mjs"
 
 class LineBreakIterator {
 	#documentPositionIterator

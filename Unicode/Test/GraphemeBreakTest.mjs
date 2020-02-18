@@ -1,4 +1,4 @@
-import getGraphemeBreakClassification from "../GraphemeBreak.js"
+import getGraphemeBreakClassification from "../GraphemeBreak.mjs"
 
 test(() => {
 	assert_equals(getGraphemeBreakClassification(0xD), "CR")

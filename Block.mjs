@@ -1,5 +1,5 @@
-import Style from "./Style.js"
-import Run from "./Run.js"
+import Style from "./Style.mjs"
+import Run from "./Run.mjs"
 
 export default class Block extends EventTarget {
 	#text
