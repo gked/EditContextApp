@@ -17,14 +17,14 @@ export default class SimpleEditorView {
 
 	constructor(document) {
 		this.#document = document
+		this.#document.generateDemoData()
 		this.#document.addEventListener("changed", this.handleDocumentChanged.bind(this))
 
-		let blockIterator = this.#document.blocks()
-		let firstBlock = blockIterator.next().value
-		let secondBlock = blockIterator.next().value
-
-		this.#selection = new Selection(this.#document, /*intialBlock*/firstBlock)
-		this.#selection.select(firstBlock, 3, secondBlock, 4)
+		this.#selection = new Selection(this.#document)
+		this.#selection.select(
+			this.#document.firstPosition, 
+			this.#document.lastPosition
+		)
 		this.#selection.addEventListener("invalidated", this.invalidate.bind(this))
 
 		this.#renderCallback = this.renderCallback.bind(this)
@@ -115,10 +115,7 @@ export default class SimpleEditorView {
 
 	renderCaret() {
 		let caretPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
-			new DocumentPosition(
-				this.#selection.startBlock,
-				this.#selection.startOffset
-			)
+			this.#selection.start
 		)
 
 		let ctx = this.#rc.shared2dContext
@@ -136,17 +133,11 @@ export default class SimpleEditorView {
 		let linesToPaint = []
 
 		let startPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
-			new DocumentPosition(
-				this.#selection.startBlock,
-				this.#selection.startOffset
-			)
+			this.#selection.start
 		)
 
 		let endPosition = this.#blockLayout.layoutPositionFromDocumentPosition(
-			new DocumentPosition(
-				this.#selection.endBlock,
-				this.#selection.endOffset
-			)
+			this.#selection.end
 		)
 
 		let startFound = false
