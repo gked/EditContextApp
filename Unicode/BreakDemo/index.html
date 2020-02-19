@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Unicode Break Demos</title>
+	<style>
+		body {
+			display: grid;
+			font-family: Consolas, sans-serif;
+		}
+		#demo {
+			display: inline-grid;
+			justify-self: center;
+			grid-template:
+				  "break-menu       text-menu"
+				  "demo-text        demo-text"
+				  "break-result     break-result"
+				  "forward-offsets  forward-offsets"
+				  "backward-offsets backward-offsets" / 
+				  max-content       max-content
+			;
+			grid-gap: 20px 30px;
+		}
+		#break-menu {
+			grid-area: break-menu;
+		}
+		#text-menu {
+			grid-area: text-menu;
+		}
+		textarea {
+			min-height: 200px;
+			min-width: 400px;
+
+			grid-area: demo-text;
+			justify-self: stretch;
+		}
+		#break-result-area {
+			grid-area: break-result;
+			justify-self: stretch;
+
+			display: grid;
+		}
+		#break-result {
+			border: 1px solid black;
+			min-height: 200px;
+			min-width: 400px;
+
+			grid-row: 2;
+			justify-self: stretch;
+		}
+		#forward-offsets-area {
+			grid-area: forward-offsets;
+			justify-self: stretch;
+
+			display: grid;
+		}
+		#forward-offsets {
+			grid-row: 2;
+			justify-self: stretch;
+		}
+		#backward-offsets-area {
+			grid-area: backward-offsets;
+			justify-self: stretch;
+
+			display: grid;
+		}
+		#backward-offsets {
+			grid-row: 2;
+			justify-self: stretch;
+		}
+	</style>
+</head>
+<body>
+	<div id="demo">
+		<div id="break-menu">
+			<label for="break-type">Break:</label>
+			<select id="break-type">
+				<option value="Grapheme">Grapheme (characters)</option>
+				<option>Word</option>
+				<option>Sentence</option>
+				<option value="Line">Line (opportunities)</option>
+			</select>
+		</div>
+		<div id="text-menu">
+			<label for="demo-text">Demo text:</label>
+			<select id="demo-text">
+				<option>Plymouth Plantation (ICU demo)</option>
+			</select>
+		</div>
+		<textarea></textarea>
+		<div id="break-result-area">
+			<label for="break-result">Break result:</label>
+			<div id="break-result"></div>
+		</div>
+		<div id="forward-offsets-area">
+			<label for="forward-offsets">Forward offsets:</label>
+			<div id="forward-offsets"></div>
+		</div>
+		<div id="backward-offsets-area">
+			<label for="backward-offsets">Backward offsets:</label>
+			<div id="backward-offsets"></div>
+		</div>
+	</div>
+	<script type="module">
+		import GraphemeBreakIterator from "../GraphemeBreakIterator.mjs"
+
+		let textarea = document.querySelector("textarea")
+		textarea.addEventListener("input", queueChange)
+		textarea.addEventListener("change", queueChange)
+
+		function queueChange() {
+			requestAnimationFrame(updateBreaks)
+		}
+
+		let breakTypeSelect = document.querySelector("#break-type")
+		function updateBreaks() {
+			let breakType = breakTypeSelect.value
+			let text = textarea.value
+
+			let iterator
+			switch (breakType) {
+				case "Grapheme":
+					iterator = new GraphemeBreakIterator(text)
+					break
+				case "Word":
+					iterator = new GraphemeBreakIterator(text)
+					break
+				case "Sentence":
+					iterator = new GraphemeBreakIterator(text)
+					break
+				case "Line":
+					iterator = new GraphemeBreakIterator(text)
+					break
+			}
+
+			let lastOffset = 0
+			let separatorMarkup = "<span style=\"border-left:1px solid red\"></span>"
+			let brokenHTML = separatorMarkup
+
+			// for validation
+			let forwardOffsets = []
+			let backwardOffsets = []
+
+			forwardOffsets.push(iterator.offset)
+			while(iterator.next()) {
+				brokenHTML += text.slice(lastOffset, iterator.offset)
+				brokenHTML += separatorMarkup
+				lastOffset = iterator.offset
+				forwardOffsets.push(iterator.offset)
+			}
+
+			backwardOffsets.push(iterator.offset)
+			while(iterator.previous()) {
+				backwardOffsets.push(iterator.offset)
+			}
+
+			backwardOffsets.reverse()
+
+			let forwardOffsetsHTML = forwardOffsets.join(", ")
+			let backwardOffsetsHTML = backwardOffsets.join(", ")
+
+			document.querySelector("#break-result").innerHTML = brokenHTML
+			document.querySelector("#forward-offsets").innerHTML = forwardOffsetsHTML
+			document.querySelector("#backward-offsets").innerHTML = backwardOffsetsHTML
+		}
+	</script>
+</body>
+</html>
