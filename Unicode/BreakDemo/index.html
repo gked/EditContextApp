@@ -11,24 +11,23 @@
 			display: inline-grid;
 			justify-self: center;
 			grid-template:
-				  "break-menu       text-menu"
-				  "demo-text        demo-text"
-				  "break-result     break-result"
-				  "forward-offsets  forward-offsets"
-				  "backward-offsets backward-offsets" / 
-				  max-content       max-content
+				  "break-menu   text-menu"
+				  "demo-text    demo-text"
+				  "break-result break-result" /
+				  min-content   min-content
 			;
 			grid-gap: 20px 30px;
 		}
 		#break-menu {
+			white-space: nowrap;
 			grid-area: break-menu;
 		}
 		#text-menu {
+			white-space: nowrap;
 			grid-area: text-menu;
 		}
 		textarea {
 			min-height: 200px;
-			min-width: 400px;
 
 			grid-area: demo-text;
 			justify-self: stretch;
@@ -42,28 +41,7 @@
 		#break-result {
 			border: 1px solid black;
 			min-height: 200px;
-			min-width: 400px;
 
-			grid-row: 2;
-			justify-self: stretch;
-		}
-		#forward-offsets-area {
-			grid-area: forward-offsets;
-			justify-self: stretch;
-
-			display: grid;
-		}
-		#forward-offsets {
-			grid-row: 2;
-			justify-self: stretch;
-		}
-		#backward-offsets-area {
-			grid-area: backward-offsets;
-			justify-self: stretch;
-
-			display: grid;
-		}
-		#backward-offsets {
 			grid-row: 2;
 			justify-self: stretch;
 		}
@@ -90,14 +68,6 @@
 		<div id="break-result-area">
 			<label for="break-result">Break result:</label>
 			<div id="break-result"></div>
-		</div>
-		<div id="forward-offsets-area">
-			<label for="forward-offsets">Forward offsets:</label>
-			<div id="forward-offsets"></div>
-		</div>
-		<div id="backward-offsets-area">
-			<label for="backward-offsets">Backward offsets:</label>
-			<div id="backward-offsets"></div>
 		</div>
 	</div>
 	<script type="module">
@@ -155,12 +125,12 @@
 
 			backwardOffsets.reverse()
 
-			let forwardOffsetsHTML = forwardOffsets.join(", ")
-			let backwardOffsetsHTML = backwardOffsets.join(", ")
+			console.assert(forwardOffsets.length === backwardOffsets.length)
+			for (let i = 0; i < forwardOffsets.length; i++) {
+				console.assert(forwardOffsets[i] === backwardOffsets[i])
+			}
 
 			document.querySelector("#break-result").innerHTML = brokenHTML
-			document.querySelector("#forward-offsets").innerHTML = forwardOffsetsHTML
-			document.querySelector("#backward-offsets").innerHTML = backwardOffsetsHTML
 		}
 	</script>
 </body>
