@@ -1,4 +1,4 @@
-import Base64 from "../Base64/Base64.mjs"
+import Base64 from "../Encoding/Base64/Base64.mjs"
 
 import graphemeBreakClassifications from "./GraphemeBreakClassifications.json"
 import encodedGraphemeBreakData from "./GraphemeBreakData.json"

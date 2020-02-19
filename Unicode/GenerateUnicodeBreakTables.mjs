@@ -1,7 +1,7 @@
 import readline from "readline"
 import fs from "fs"
 
-import Base64 from "../Base64/Base64.mjs"
+import Base64 from "../Encoding/Base64/Base64.mjs"
 
 import graphemeBreakClassifications from "./GraphemeBreakClassifications.json"
 
