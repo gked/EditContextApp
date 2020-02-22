@@ -108,13 +108,11 @@ export default class BlockLayout {
 
 				blocks.forEach(function(value, key) {
 					let lines = this.layoutBlock(key)
-					//let lastKnownOffset = 0;
 					for (let it = 0; it < lines.length; it++) {
 						runningBlockHeight += lines[it].height
 						if (y <= runningBlockHeight && y >= runningBlockHeight - lines[it].height) {
 							position.block = key
-							let currentLineRun = lines[it]
-							console.log('current lines text - ', currentLineRun.text.slice(0, currentLineRun.text.length))							
+							let currentLineRun = lines[it]					
 							let runningLineWidth = editorOffset.left
 							// find the right line run
 							for (let i of currentLineRun) {
@@ -123,8 +121,6 @@ export default class BlockLayout {
 								let currentTextMeasure = ctx.measureText(currentText)
 								//check if X is within current line bounds
 								if (runningLineWidth + currentTextMeasure.width >= x) {
-									console.log('found the right word: ', currentText)
-									console.log('X =  ', x)
 									for (let ind = i.start; ind < i.end; ind++) {
 										let character = currentLineRun.text.slice(ind, ind + 1)
 										let characterWidth = ctx.measureText(character).width
@@ -136,33 +132,23 @@ export default class BlockLayout {
 											validPositionFound = true
 											break												
 										}
-										//lastKnownOffset = ind
 										runningLineWidth += characterWidth				
 									}
 									break
 								}
 								runningLineWidth += currentTextMeasure.width
-							}
-							if (validPositionFound === false) {
 								lastKnownBlock = key
 								lastKnownOffset = currentLineRun.text.length
 								validPositionFound = true
 							}
 						}
+						// handle the case where Y coordinate is above or below text
+						if (!validPositionFound) {
+							lastKnownBlock = key
+							lastKnownOffset = lines[it].text.length
+						}
 					}
-					// if (validPositionFound === false) {
-					// 	lastKnownBlock = key
-					// 	lastKnownOffset = currentLineRun.text.length
-					// 	validPositionFound = true
-					// }
 				}, this)
-
-								
-				// if user click on a white space within editor, we place the caret in the last known block
-				// if (!validPositionFound) {
-				// 	position.block = lastKnownBlock
-				// 	position.offset = 0
-				// }
 				position.block = lastKnownBlock
 				position.offset = lastKnownOffset
 		}
