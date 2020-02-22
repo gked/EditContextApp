@@ -95,7 +95,6 @@ export default class BlockLayout {
 			offset: 0,
 		}
 
-		console.log(x, y, editorOffset)
 		// make sure click is within bounds of editor
 		if (x > editorOffset.left &&
 			x < editorOffset.left + ctx.canvas.width &&
@@ -112,16 +111,35 @@ export default class BlockLayout {
 					for (let it = 0; it < lines.length; it++) {
 						runningBlockHeight += lines[it].height
 						if (y <= runningBlockHeight && y >= runningBlockHeight - lines[it].height) {
-							console.log('this is block #: ', it, ' with line height of :', runningBlockHeight, ' pixels')
 							position.block = key
-							// now find position on the line
-							let layoutRuns = [...key.runs()].map(r => {
-								let fSize = r.style.fontSize
-								console.log('font size: ', fSize)
-							})
-							//console.log('Line has: ', lines[it].runs[0])
-							position.offset = 0
-							validPositionFound = true
+							let currentLine = lines[it]
+							console.log('current lines text - ', currentLine.text.slice(0, currentLine.text.length))							
+							let runningLineWidth = editorOffset.left
+							// find the right line run
+							for (let i of currentLine) {
+								ctx.font = i.style.font
+								let currentText = currentLine.text.slice(i.start, i.end)
+								let currentTextMeasure = ctx.measureText(currentText)
+								//check if X is within current line bounds
+								if (runningLineWidth + currentTextMeasure.width >= x) {
+									console.log('found the right word: ', currentText)
+									console.log('X =  ', x)
+									for (let ind = i.start; ind < i.end; ind++) {
+										let character = currentLine.text.slice(ind, ind + 1)
+										let characterWidth = ctx.measureText(character).width
+										if (runningLineWidth + characterWidth >= x ) {
+											runningLineWidth += characterWidth
+											position.offset = ind
+											validPositionFound = true
+											console.log('found the right character ', character)
+											break												
+										}
+										runningLineWidth += characterWidth				
+									}
+									break
+								}
+								runningLineWidth += currentTextMeasure.width
+							}
 						}
 					}
 				}, this)

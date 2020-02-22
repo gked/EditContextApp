@@ -18,6 +18,7 @@ export default class BlinkTimer extends EventTarget {
 
 	// start or reset countdown
 	reset() {
+		this.#on = true
 		clearInterval(this.#intervalId)
 		this.#intervalId = setInterval(this.callback.bind(this), this.#interval)
 	}

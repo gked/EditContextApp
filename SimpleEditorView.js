@@ -133,7 +133,7 @@ export default class SimpleEditorView {
 
 	getElementOffset (element) {
 		const rect = element.getBoundingClientRect(),
-		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft, // we don't account for scroll
 		scrollTop = window.pageYOffset || document.documentElement.scrollTop
 		return { top: rect.top + scrollTop, left: rect.left + scrollLeft  }
 	}
