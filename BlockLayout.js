@@ -103,53 +103,68 @@ export default class BlockLayout {
 				const blocks = this.#blockLineCache.getBlocks()
 				let runningBlockHeight = editorOffset.top
 				let lastKnownBlock = null
+				let lastKnownOffset = 0
 				let validPositionFound = false
 
 				blocks.forEach(function(value, key) {
-					lastKnownBlock = key
 					let lines = this.layoutBlock(key)
+					//let lastKnownOffset = 0;
 					for (let it = 0; it < lines.length; it++) {
 						runningBlockHeight += lines[it].height
 						if (y <= runningBlockHeight && y >= runningBlockHeight - lines[it].height) {
 							position.block = key
-							let currentLine = lines[it]
-							console.log('current lines text - ', currentLine.text.slice(0, currentLine.text.length))							
+							let currentLineRun = lines[it]
+							console.log('current lines text - ', currentLineRun.text.slice(0, currentLineRun.text.length))							
 							let runningLineWidth = editorOffset.left
 							// find the right line run
-							for (let i of currentLine) {
+							for (let i of currentLineRun) {
 								ctx.font = i.style.font
-								let currentText = currentLine.text.slice(i.start, i.end)
+								let currentText = currentLineRun.text.slice(i.start, i.end)
 								let currentTextMeasure = ctx.measureText(currentText)
 								//check if X is within current line bounds
 								if (runningLineWidth + currentTextMeasure.width >= x) {
 									console.log('found the right word: ', currentText)
 									console.log('X =  ', x)
 									for (let ind = i.start; ind < i.end; ind++) {
-										let character = currentLine.text.slice(ind, ind + 1)
+										let character = currentLineRun.text.slice(ind, ind + 1)
 										let characterWidth = ctx.measureText(character).width
+										// do we have the right character at X?
 										if (runningLineWidth + characterWidth >= x ) {
 											runningLineWidth += characterWidth
-											position.offset = ind
+											lastKnownBlock = key
+											lastKnownOffset = ind
 											validPositionFound = true
-											console.log('found the right character ', character)
 											break												
 										}
+										//lastKnownOffset = ind
 										runningLineWidth += characterWidth				
 									}
 									break
 								}
 								runningLineWidth += currentTextMeasure.width
 							}
+							if (validPositionFound === false) {
+								lastKnownBlock = key
+								lastKnownOffset = currentLineRun.text.length
+								validPositionFound = true
+							}
 						}
 					}
+					// if (validPositionFound === false) {
+					// 	lastKnownBlock = key
+					// 	lastKnownOffset = currentLineRun.text.length
+					// 	validPositionFound = true
+					// }
 				}, this)
-				
-				// if user click on a white space within editor, we place the caret in the last known block
-				if (!validPositionFound) {
-					position.block = lastKnownBlock
-					position.offset = 0
-				}
 
+								
+				// if user click on a white space within editor, we place the caret in the last known block
+				// if (!validPositionFound) {
+				// 	position.block = lastKnownBlock
+				// 	position.offset = 0
+				// }
+				position.block = lastKnownBlock
+				position.offset = lastKnownOffset
 		}
 		return position
 	}
