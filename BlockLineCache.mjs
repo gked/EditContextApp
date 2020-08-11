@@ -16,4 +16,8 @@ export default class BlockLineCache {
 	delete(block) {
 		this.#map.delete(block)
 	}
+
+	getBlocks() {
+		return this.#map
+	}
 }

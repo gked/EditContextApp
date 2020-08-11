@@ -15,7 +15,7 @@ export default class BlockLayout {
 		this.#canvasContext = canvasContext
 	}
 
-	layoutBlock(block) {
+	layoutBlock (block) {
 			let lines = this.#blockLineCache.get(block)
 			if (lines) {
 				return lines
@@ -56,13 +56,13 @@ export default class BlockLayout {
 				lineTop += line.height
 			}
 		}
-		
+
 		let lines = this.#blockLineCache.get(block)
-		
+
 		let line
 		let run
 		let foundRun = false
-		
+
 		for (line of lines) {
 			for (run of line) {
 				if (run.end >= offset) {
@@ -89,4 +89,78 @@ export default class BlockLayout {
 		return new LayoutPosition(line, run, lineTop, offsetX)
 	}
 
+	documentPositionFromPoint(x, y, editorOffset) {
+		//const block, offset
+		let ctx = this.#canvasContext
+		const position = {
+			block: null,
+			offset: 0,
+		}
+
+		const blocks = this.#blockLineCache.getBlocks()
+		let runningBlockHeight = editorOffset.top
+		let lastKnownBlock = null
+		let lastKnownOffset = 0
+		let validVerticalPositionFound = false
+		let correctLine
+		let hasFoundTheLine = false
+		let correctLineRun
+
+		for (let [key, value] of blocks) {
+			// get lines in the current block
+			let lines = this.layoutBlock(key)
+			// find the right line
+			for (let it = 0; it < lines.length; it++) {
+				runningBlockHeight += lines[it].height
+				if (y <= runningBlockHeight && y >= runningBlockHeight - lines[it].height) {
+					// found the right line
+					correctLine = lines[it]
+					lastKnownBlock = key
+					hasFoundTheLine = true
+					validVerticalPositionFound = true
+					break
+				}
+				// handle the case where Y coordinate is above or below text
+				if (!validVerticalPositionFound) {
+					lastKnownBlock = key
+					lastKnownOffset = lines[it].text.length
+				}
+			}
+			if (hasFoundTheLine)
+				break
+		}
+
+		//check if X is within current line run bounds
+		if (validVerticalPositionFound) {
+			let runningLineWidth = editorOffset.left
+			for (let lineRun of correctLine) {
+				ctx.font = lineRun.style.font
+				if (runningLineWidth + lineRun.measure.width >= x) {
+					correctLineRun = lineRun
+					break
+				}
+				runningLineWidth += lineRun.measure.width
+				lastKnownOffset = correctLine.text.length
+			}
+
+			if (correctLineRun) {
+				for (let ind = correctLineRun.start; ind < correctLineRun.end; ind++) {
+					let character = correctLine.text.slice(ind, ind + 1)
+					let characterWidth = ctx.measureText(character).width
+					// do we have the right character at X?
+					if (runningLineWidth + characterWidth >= x ) {
+						runningLineWidth += characterWidth
+						lastKnownOffset = ind
+						break
+					}
+					runningLineWidth += characterWidth
+				}
+			}
+		}
+
+		position.block = lastKnownBlock
+		position.offset = lastKnownOffset
+
+		return position
+	}
 }

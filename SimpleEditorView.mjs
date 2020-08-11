@@ -33,6 +33,8 @@ export default class SimpleEditorView {
 		this.#blockLayout = new BlockLayout(this.#document, this.#rc.shared2dContext)
 
 		this.#rc.addEventListener("resize", this.handleResize.bind(this))
+
+		this.#rc.container.addEventListener('pointerdown', this.handleInsertionPointByUser.bind(this))
 	}
 
 	// expose the container so that controlling types can display it
@@ -46,7 +48,7 @@ export default class SimpleEditorView {
 			this.#invalidated = true
 
 			// TODO: is this the best way?
-			// This will add one frame of delay to our updates, 
+			// This will add one frame of delay to our updates,
 			// but gives time for all events to be processed first.
 			requestAnimationFrame(this.#renderCallback)
 		}
@@ -62,7 +64,7 @@ export default class SimpleEditorView {
 		for (let block of e.changedBlocks) {
 			this.#blockLayout.invalidateBlock(block)
 		}
-		
+
 		this.invalidate()
 	}
 
@@ -190,4 +192,14 @@ export default class SimpleEditorView {
 			lineOffset += line.height
 		}
 	}
+
+	handleInsertionPointByUser(e) {
+		let position = this.#blockLayout.documentPositionFromPoint(e.x, e.y, this.getElementOffset(this.#rc.container))
+		this.#selection.select(position.block, position.offset, position.block, position.offset)
+		this.invalidate()
+	}
+
+	getElementOffset (element) {
+		const rect = element.getBoundingClientRect()
+		return { top: rect.top, left: rect.left  }
 }
